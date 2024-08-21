@@ -15,7 +15,7 @@ function getUserIdFromToken(token: string): number | null {
   }
 }
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -27,35 +27,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 
-  const { recipientAccount, amount } = await req.json();
-
-  const sender = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: userId },
-  });
-  const recipient = await prisma.user.findUnique({
-    where: { accountNumber: recipientAccount },
+    select: { name: true, email: true, accountNumber: true, balance: true },
   });
 
-  if (!sender || !recipient) {
-    return NextResponse.json({ error: 'Account not found' }, { status: 404 });
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  if (sender.balance < amount) {
-    return NextResponse.json(
-      { error: 'Insufficient balance' },
-      { status: 400 }
-    );
-  }
-
-  await prisma.user.update({
-    where: { id: sender.id },
-    data: { balance: { decrement: amount } },
-  });
-
-  await prisma.user.update({
-    where: { id: recipient.id },
-    data: { balance: { increment: amount } },
-  });
-
-  return NextResponse.json({ message: 'Transaction successful' });
+  return NextResponse.json(user);
 }
