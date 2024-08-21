@@ -9,13 +9,15 @@ const prisma = new PrismaClient();
 // Initialize Arcjet for the auth route
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
-  characteristics: ['ip'], // Identify users by their IP address for login rate limiting
+  characteristics: process.env.NODE_ENV === 'development' ? [] : ['ip'], // Skip IP characteristic in development
   rules: [
     tokenBucket({
-      mode: 'LIVE', // LIVE mode will block requests
-      refillRate: 5, // Refill 5 tokens every interval
-      interval: 10, // Interval in seconds for refilling tokens
-      capacity: 10, // Maximum capacity of the token bucket
+      mode: 'LIVE',
+      refillRate: 5, // refill 5 tokens per interval
+      interval: 30, // refill every 30 seconds
+      capacity: 10, // bucket maximum capacity of 10 tokens
+
+      // Users can only sign in two times and then they have to wait 30 seconds before they can try again each time
     }),
   ],
 });
@@ -25,8 +27,12 @@ export async function POST(req: Request) {
   const ip =
     req.headers.get('x-forwarded-for') ||
     req.headers.get('x-real-ip') ||
-    'unknown-ip';
-  const decision = await aj.protect(req, { ip, requested: 5 });
+    '127.0.0.1'; // Fallback to 127.0.0.1 or another mock IP in development
+
+  const decision = await aj.protect(req, {
+    ip,
+    requested: 5,
+  });
 
   if (decision.isDenied()) {
     return NextResponse.json(

@@ -1,10 +1,13 @@
-import arcjet, { tokenBucket } from '@arcjet/next';
+import arcjet, { tokenBucket, shield } from '@arcjet/next';
 
 // Initialize Arcjet with configuration
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
-  characteristics: ['userId'],
+  characteristics: ['fingerprint'],
   rules: [
+    shield({
+      mode: 'LIVE', // Actively block suspicious behavior
+    }),
     tokenBucket({
       mode: 'LIVE', // will block requests, use "DRY_RUN" to log only
       refillRate: 5, // refill 5 tokens every interval
