@@ -1,8 +1,7 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import Header from '../components/Header';
 interface UserInfo {
   name: string;
   email: string;
@@ -69,9 +68,13 @@ export default function TransactionPage() {
       body: JSON.stringify({ recipientAccount, amount }),
     });
 
-    if (res.ok) {
+    if (res.ok && amount > 0) {
       setMessage('Transaction successful!');
       fetchUserInfo(token); // Refresh user info after successful transaction
+      setRecipientAccount('');
+      setAmount(0);
+    } else if (amount <= 0) {
+      setMessage(`Error: The amount you send, needs to be higher than 0`);
     } else {
       const errorData = await res.json();
       setMessage(`Error: ${errorData.error}`);
@@ -83,43 +86,50 @@ export default function TransactionPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Transaction Page</h1>
-      <div className="mb-4">
-        <p>Name: {userInfo.name}</p>
-        <p>Email: {userInfo.email}</p>
-        <p>Account Number: {userInfo.accountNumber}</p>
-        <p>Balance: ${userInfo.balance.toFixed(2)}</p>
+    <div>
+      <div>
+        <Header />
       </div>
-      <button
-        onClick={handleSignOut}
-        className="bg-red-500 text-white px-4 py-2 rounded mb-4"
-      >
-        Sign Out
-      </button>
-      <form onSubmit={handleTransaction} className="space-y-4">
-        <input
-          type="text"
-          value={recipientAccount}
-          onChange={(e) => setRecipientAccount(e.target.value)}
-          placeholder="Recipient Account Number"
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-          placeholder="Amount"
-          className="w-full p-2 border rounded"
-        />
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-4">Transaction Page</h1>
+        <div className="mb-4">
+          <h1 className="text-2xl">{userInfo.name}</h1>
+          <p className="mt-4 mb-4">Email: {userInfo.email}</p>
+          <p className="mt-4 mb-4">Account Number: {userInfo.accountNumber}</p>
+          <p className="bg-slate-200 p-4">
+            Balance: ${userInfo.balance.toFixed(2)}
+          </p>
+        </div>
         <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleSignOut}
+          className="bg-slate-800 text-white px-4 py-2 rounded mb-4"
         >
-          Send
+          Sign Out
         </button>
-      </form>
-      {message && <p className="mt-4 text-center font-bold">{message}</p>}
+        <form onSubmit={handleTransaction} className="space-y-4">
+          <input
+            type="text"
+            value={recipientAccount}
+            onChange={(e) => setRecipientAccount(e.target.value)}
+            placeholder="Recipient Account Number"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            placeholder="Amount"
+            className="w-full p-2 border rounded"
+          />
+          <button
+            type="submit"
+            className="bg-green-400 text-white px-4 py-2 rounded"
+          >
+            Send
+          </button>
+        </form>
+        {message && <p className="mt-4 text-center font-bold">{message}</p>}
+      </div>
     </div>
   );
 }

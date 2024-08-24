@@ -25,23 +25,6 @@ const aj = arcjet({
       interval: 10, // Interval in seconds for refilling tokens
       capacity: 10, // Maximum capacity of the token bucket
     }),
-
-    // Uncomment and customize the protectSignup rule if you want it applied globally
-    // protectSignup({
-    //   email: {
-    //     mode: 'LIVE',
-    //     block: ['DISPOSABLE', 'INVALID', 'NO_MX_RECORDS'],
-    //   },
-    //   bots: {
-    //     mode: 'LIVE',
-    //     block: ['AUTOMATED'],
-    //   },
-    //   rateLimit: {
-    //     mode: 'LIVE',
-    //     interval: '2m', // Counts requests over a 2-minute sliding window
-    //     max: 5, // Allows 5 submissions within the window
-    //   },
-    // }),
   ],
 });
 

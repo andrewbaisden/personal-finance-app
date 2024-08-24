@@ -1,9 +1,7 @@
-// src/app/api/generatejwt/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET!; // Your JWT secret
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 export async function POST(request: NextRequest) {
   try {
