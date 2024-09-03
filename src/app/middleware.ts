@@ -5,7 +5,6 @@ import arcjet, { shield } from '@arcjet/next';
 // Initialize Arcjet with shield protection
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
-  characteristics: ['fingerprint'],
   rules: [
     shield({
       mode: 'LIVE', // Enforce live protection
@@ -14,18 +13,12 @@ const aj = arcjet({
 });
 
 export async function middleware(req: NextRequest) {
-  // Extract the IP address or fingerprint from the request headers
-  const fingerprint =
-    req.headers.get('x-forwarded-for') ||
-    req.headers.get('x-real-ip') ||
-    'unknown-ip';
-
   // Apply Arcjet protection
-  const decision = await aj.protect(req, { fingerprint });
+  const decision = await aj.protect(req);
 
   if (decision.isDenied()) {
     return NextResponse.json(
-      { error: 'Forbidden: Suspicious activity detected', ip: fingerprint },
+      { error: 'Forbidden: Suspicious activity detected' },
       { status: 403 }
     );
   }

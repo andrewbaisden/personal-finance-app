@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Personal Finance App
 
-## Getting Started
+![Personal Finance App](/img/personal-finance-app-homepage.png 'Personal Finance App')
 
-First, run the development server:
+## Install and setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Create an account on [Arcjet](https://arcjet.com/)
+2. Create a `.env.local` file and put it in the root folder
+
+We need an `ARCJET_KEY`, which you will find in the SDK CONFIGURATION section on your account.
+
+We can generate a JWT secret key using the built-in Node.js `crypto` module by running this code in the command line:
+
+```shell
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Add both keys to the `.env.local` file:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```shell
+ARCJET_KEY=your_arcjet_key
+JWT_SECRET=your_jwt_secret
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+3. Install the depenencies using the command `npm install`
+4. Run the application with the command `npm run dev`
 
-## Learn More
+## Managing the SQLite database
 
-To learn more about Next.js, take a look at the following resources:
+All users are saved inside of the SQLite database inside of the directory `prisma/dev.db`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+If you want to view the data inside your SQLite database, you can use a VS Code extension like [SQLite Viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer), although you won't be able to run any SQL queries. Alternatively, you can use the command line by referring to the [SQLite Documentation](https://www.sqlite.org/docs.html) or a database management tool like [TablePlus](https://tableplus.com/).

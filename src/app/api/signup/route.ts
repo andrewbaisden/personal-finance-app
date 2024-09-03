@@ -1,5 +1,5 @@
 import arcjet, { protectSignup } from '@arcjet/next';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -8,7 +8,6 @@ const prisma = new PrismaClient();
 // Initialize Arcjet with the protectSignup rule
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
-  characteristics: ['fingerprint'], // You can add more characteristics as needed
   rules: [
     protectSignup({
       email: {
@@ -28,18 +27,12 @@ const aj = arcjet({
   ],
 });
 
-export async function POST(req: Request) {
-  // Retrieve the IP address from headers
-  const ip =
-    req.headers.get('x-forwarded-for') ||
-    req.headers.get('x-real-ip') ||
-    'unknown-ip';
-
+export async function POST(req: NextRequest) {
   // Parse the request body
   const { name, email, password } = await req.json();
 
   // Apply Arcjet protection to the signup route
-  const decision = await aj.protect(req, { fingerprint: ip, email });
+  const decision = await aj.protect(req, { email });
 
   if (decision.isDenied()) {
     if (decision.reason.isEmail()) {

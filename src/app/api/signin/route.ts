@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -9,7 +9,6 @@ const prisma = new PrismaClient();
 // Initialize Arcjet with bot detection rule
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
-  characteristics: ['fingerprint'],
   rules: [
     detectBot({
       mode: 'LIVE', // Block automated clients
@@ -18,15 +17,8 @@ const aj = arcjet({
   ],
 });
 
-export async function POST(req: Request) {
-  // Retrieve the IP address from the request headers
-  const ip =
-    req.headers.get('x-forwarded-for') ||
-    req.headers.get('x-real-ip') ||
-    '127.0.0.1'; // Fallback to localhost IP in case none are found
-
-  // Apply Arcjet protection using the IP address as part of the fingerprint
-  const decision = await aj.protect(req, { fingerprint: ip });
+export async function POST(req: NextRequest) {
+  const decision = await aj.protect(req);
   console.log('Arcjet decision: ', decision);
 
   if (decision.isDenied()) {
